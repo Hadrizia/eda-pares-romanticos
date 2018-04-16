@@ -8,6 +8,7 @@ output: html_notebook
 ```{r setup, warning=FALSE, message=FALSE}
 library(tidyverse)
 library(here)
+library(dplyr)
 theme_set(theme_bw())
 ```
 
@@ -38,6 +39,33 @@ Ao longo dos anos, a diferença caiu?
 
 Há mais/menos diferença de idade quando o casal é do mesmo sexo? 
 
+Há relação entre o diretor e a diferença de idade entre os casais?
+
+Há relação entre o diretor e o tipo do casal?
+
+
+
+```{r}
+
+# Quão frequente é que homens sejam mais velhos que as mulheres? (E vice versa)
+
+diferencas %>% 
+    filter(!same_sex) %>% 
+    mutate(tipo_casal = case_when(age_difference > 0 ~ 'homem mais velho',
+                                  age_difference <= 0 ~ 'mulher igual ou mais velha')) %>%
+    ggplot(aes(x = tipo_casal, abs(age_difference), colour = tipo_casal)) + 
+    geom_boxplot() + 
+    coord_flip() +
+    theme(legend.position = 'None')
+
+```
+
+```{r}
+# Relação diretor x filmes com casais lgbt
+diferencas %>% filter(same_sex) %>% group_by(director) %>% summarise(cont = n()) %>% arrange(-cont) %>%
+    ggplot(aes(x = director, y = cont, colour = director, fill = director)) +
+    geom_bar(stat = 'identity') + coord_flip() + theme (legend.position = "None")
+```
 
 ## Algumas respostas
 
